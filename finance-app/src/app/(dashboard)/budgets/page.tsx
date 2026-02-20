@@ -23,6 +23,9 @@ export default function BudgetsPage() {
   }
 
   const periodLabels: Record<string, string> = { WEEKLY: "Weekly", BIWEEKLY: "Bi-weekly", MONTHLY: "Monthly", YEARLY: "Yearly" }
+  const [incomeOpen, setIncomeOpen] = useState(true)
+  const incomeBudgets = budgets.filter(b => b.category?.name === 'Interest' || b.category?.name === 'Other Income')
+  const expenseBudgets = budgets.filter(b => !incomeBudgets.includes(b))
 
   if (loading) return <div className="flex items-center justify-center h-64"><div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div></div>
 
@@ -32,6 +35,23 @@ export default function BudgetsPage() {
     <div className="space-y-6 grid grid-cols-1 lg:grid-cols-3 gap-6">
       <div className="col-span-2 space-y-6">
         <div className="flex justify-between items-center"><div><h1 className="text-2xl font-bold text-gray-900">Budgets</h1><p className="text-gray-500">Manage your spending limits</p></div><button onClick={() => setShowForm(!showForm)} className="flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"><Plus className="w-5 h-5" />Add Budget</button></div>
+
+        {/* Income header with toggle */}
+        <div className="bg-white border border-gray-200 rounded-lg p-3 cursor-pointer" onClick={() => setIncomeOpen(!incomeOpen)}>
+          <div className="flex items-center justify-between"><span className="font-semibold text-gray-700">Income</span><span className="text-sm text-gray-500">{incomeOpen ? 'Hide' : 'Show'}</span></div>
+        </div>
+
+        {incomeOpen && incomeBudgets.length > 0 && (
+          <div className="space-y-4 pl-4">
+            {incomeBudgets.map(budget => (
+              <div key={budget.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+                <div className="flex items-center gap-2 mb-4"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: budget.category.color || "#6b7280" }}></span><h3 className="font-semibold">{budget.category.name}</h3></div>
+                <p className="text-2xl font-bold">{formatCurrency(budget.amount)}</p>
+                <p className="text-sm text-gray-500">{periodLabels[budget.period]}</p>
+              </div>
+            ))}
+          </div>
+        )}
 
         {showForm && (
           <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
@@ -50,7 +70,7 @@ export default function BudgetsPage() {
         <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200"><div className="flex justify-between items-center"><h2 className="text-lg font-semibold">Total Monthly Budget</h2><p className="text-2xl font-bold">{formatCurrency(totalBudgeted)}</p></div></div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {budgets.map(budget => (
+          {expenseBudgets.map(budget => (
             <div key={budget.id} className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
               <div className="flex items-center gap-2 mb-4"><span className="w-3 h-3 rounded-full" style={{ backgroundColor: budget.category.color || "#6b7280" }}></span><h3 className="font-semibold">{budget.category.name}</h3></div>
               <p className="text-2xl font-bold">{formatCurrency(budget.amount)}</p>
