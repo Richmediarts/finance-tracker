@@ -1,0 +1,181 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  passwordHash  String
+  name          String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  accounts      Account[]
+  transactions Transaction[]
+  budgets      Budget[]
+  goals        SavingsGoal[]
+  debts        Debt[]
+  investments  Investment[]
+}
+
+model Account {
+  id           String    @id @default(cuid())
+  name         String
+  type         AccountType
+  institution  String?
+  balance      Float     @default(0)
+  currency     String    @default("USD")
+  userId       String
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+  
+  user         User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  transactions Transaction[]
+}
+
+enum AccountType {
+  CHECKING
+  SAVINGS
+  CREDIT_CARD
+  CASH
+  INVESTMENT
+  LOAN
+  MORTGAGE
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String
+  icon        String?
+  color       String?
+  type        CategoryType
+  userId      String
+  isDefault   Boolean   @default(false)
+  
+  transactions Transaction[]
+  budgets      Budget[]
+  
+  @@unique([name, userId])
+}
+
+enum CategoryType {
+  INCOME
+  EXPENSE
+}
+
+model Transaction {
+  id          String    @id @default(cuid())
+  amount      Float
+  date        DateTime
+  description String?
+  payee       String?
+  notes       String?
+  cleared     Boolean   @default(true)
+  
+  accountId   String
+  categoryId  String?
+  userId      String
+  
+  account     Account   @relation(fields: [accountId], references: [id], onDelete: Cascade)
+  category    Category? @relation(fields: [categoryId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+model Budget {
+  id          String    @id @default(cuid())
+  amount      Float
+  period      BudgetPeriod @default(MONTHLY)
+  categoryId  String
+  userId      String
+  
+  category    Category  @relation(fields: [categoryId], references: [id])
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+}
+
+enum BudgetPeriod {
+  WEEKLY
+  BIWEEKLY
+  MONTHLY
+  YEARLY
+}
+
+model SavingsGoal {
+  id            String    @id @default(cuid())
+  name          String
+  targetAmount  Float
+  currentAmount Float     @default(0)
+  deadline      DateTime?
+  icon          String?
+  color         String?
+  
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model Debt {
+  id              String    @id @default(cuid())
+  name            String
+  balance         Float
+  originalBalance Float
+  interestRate    Float
+  minimumPayment  Float
+  dueDate         DateTime?
+  
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  payments        DebtPayment[]
+  
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+}
+
+model DebtPayment {
+  id        String   @id @default(cuid())
+  amount    Float
+  date      DateTime
+  
+  debtId    String
+  debt      Debt     @relation(fields: [debtId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+}
+
+model Investment {
+  id            String    @id @default(cuid())
+  name          String
+  symbol        String?
+  type          InvestmentType
+  shares        Float
+  purchasePrice Float
+  currentPrice  Float
+  
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum InvestmentType {
+  STOCK
+  ETF
+  BOND
+  MUTUAL_FUND
+  CRYPTO
+  OTHER
+}
