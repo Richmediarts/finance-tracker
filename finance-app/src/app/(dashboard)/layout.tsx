@@ -1,13 +1,31 @@
-import Link from "next/link"
-import { redirect } from "next/navigation"
-import { getServerSession } from "next-auth"
-import { authOptions } from "@/lib/auth"
-import { LayoutDashboard, Wallet, CreditCard, PiggyBank, TrendingDown, TrendingUp, Settings, LogOut } from "lucide-react"
-import { signOut } from "next-auth/react"
+"use client"
 
-export default async function DashboardLayout({ children }: { children: React.ReactNode }) {
-  const session = await getServerSession(authOptions)
-  if (!session) redirect("/login")
+import Link from "next/link"
+import { useState } from "react"
+import { redirect } from "next/navigation"
+import { useSession, signOut } from "next-auth/react"
+import { 
+  LayoutDashboard, Wallet, CreditCard, PiggyBank, TrendingDown, TrendingUp, 
+  Settings, LogOut, Menu, X, Bell, Search, ChevronLeft, ChevronRight
+} from "lucide-react"
+import ThemeToggle from "@/components/ThemeToggle"
+
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
+  const { data: session, status } = useSession()
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  if (status === "loading") {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-background">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+      </div>
+    )
+  }
+  
+  if (status === "unauthenticated") {
+    redirect("/login")
+  }
 
   const navItems = [
     { href: "/", icon: LayoutDashboard, label: "Dashboard" },
@@ -21,26 +39,115 @@ export default async function DashboardLayout({ children }: { children: React.Re
   ]
 
   return (
-    <div className="min-h-screen bg-gray-50 flex">
-      <aside className="w-64 bg-white border-r border-gray-200 fixed h-full">
-        <div className="p-6 border-b border-gray-200">
-          <h1 className="text-xl font-bold text-blue-600">Finance Tracker</h1>
-          <p className="text-sm text-gray-500 mt-1">{session.user?.name || session.user?.email}</p>
+    <div className="min-h-screen bg-background dark:bg-gray-900 dark:text-gray-100 flex">
+      {/* Mobile overlay */}
+      {mobileMenuOpen && (
+        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setMobileMenuOpen(false)} />
+      )}
+
+      {/* Sidebar */}
+      <aside className={`fixed top-0 left-0 z-50 h-full bg-[#11142D] text-white transition-all duration-300 ${
+        sidebarCollapsed ? "w-20" : "w-72"
+      } ${mobileMenuOpen ? "translate-x-0" : "-translate-x-full"} lg:translate-x-0`}>
+        {/* Logo */}
+        <div className="h-16 flex items-center justify-between px-4 border-b border-white/10">
+          <div className={`flex items-center gap-3 ${sidebarCollapsed ? "justify-center w-full" : ""}`}>
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center">
+              <span className="text-lg font-bold">F</span>
+            </div>
+            {!sidebarCollapsed && (
+              <div>
+                <h1 className="text-lg font-bold">Finance</h1>
+                <p className="text-xs text-white/50">Admin Dashboard</p>
+              </div>
+            )}
+          </div>
+          <button onClick={() => setMobileMenuOpen(false)} className="lg:hidden text-white/70 hover:text-white">
+            <X className="w-5 h-5" />
+          </button>
         </div>
-        <nav className="p-4 space-y-1">
+
+        {/* Navigation */}
+        <nav className="p-3 space-y-1">
           {navItems.map((item) => (
-            <Link key={item.href} href={item.href} className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100 transition-colors">
-              <item.icon className="w-5 h-5" />{item.label}
+            <Link 
+              key={item.href} 
+              href={item.href} 
+              className="flex items-center gap-3 px-3 py-2.5 text-white/70 rounded-xl hover:bg-white/10 hover:text-white transition-all group"
+            >
+              <item.icon className="w-5 h-5 shrink-0" />
+              {!sidebarCollapsed && <span className="text-sm font-medium">{item.label}</span>}
             </Link>
           ))}
         </nav>
-        <div className="absolute bottom-0 w-64 p-4 border-t border-gray-200">
-          <button onClick={() => signOut({ callbackUrl: "/login" })} className="flex items-center gap-3 px-3 py-2 text-gray-700 rounded-lg hover:bg-gray-100 w-full transition-colors">
-            <LogOut className="w-5 h-5" />Sign Out
-          </button>
+
+        {/* Collapse button */}
+        <button 
+          onClick={() => setSidebarCollapsed(!sidebarCollapsed)}
+          className="absolute bottom-20 right-[-12px] w-6 h-6 rounded-full bg-primary text-white flex items-center justify-center hover:bg-primary/80 transition-colors hidden lg:flex"
+        >
+          {sidebarCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+        </button>
+
+        {/* User section */}
+        <div className={`absolute bottom-0 w-full p-4 border-t border-white/10 ${sidebarCollapsed ? "px-2" : ""}`}>
+          <div className={`flex items-center gap-3 ${sidebarCollapsed ? "justify-center" : ""}`}>
+            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center text-white font-medium shrink-0">
+              {session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
+            </div>
+            {!sidebarCollapsed && (
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium truncate">{session?.user?.name || "User"}</p>
+                <p className="text-xs text-white/50 truncate">{session?.user?.email}</p>
+              </div>
+            )}
+            {!sidebarCollapsed && (
+              <button 
+                onClick={() => signOut({ callbackUrl: "/login" })} 
+                className="p-2 text-white/70 hover:text-white hover:bg-white/10 rounded-lg transition-colors"
+              >
+                <LogOut className="w-4 h-4" />
+              </button>
+            )}
+          </div>
         </div>
       </aside>
-      <main className="flex-1 ml-64 p-8">{children}</main>
+
+      {/* Main content */}
+      <div className={`transition-all duration-300 ${sidebarCollapsed ? "lg:ml-20" : "lg:ml-72"}`}>
+        {/* Header */}
+        <header className="h-16 bg-card border-b border-border flex items-center justify-between px-4 lg:px-6 sticky top-0 z-30">
+          <div className="flex items-center gap-4">
+            <button onClick={() => setMobileMenuOpen(true)} className="lg:hidden p-2 text-muted-foreground hover:text-foreground">
+              <Menu className="w-5 h-5" />
+            </button>
+            <div className="relative hidden sm:block">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+              <input 
+                type="text" 
+                placeholder="Search..." 
+                className="w-64 pl-10 pr-4 py-2 bg-muted rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary/50"
+              />
+            </div>
+          </div>
+          <div className="flex items-center gap-2">
+            <button className="p-2 text-muted-foreground hover:text-foreground hover:bg-muted rounded-lg transition-colors relative">
+              <Bell className="w-5 h-5" />
+              <span className="absolute top-1 right-1 w-2 h-2 bg-primary rounded-full"></span>
+            </button>
+            <ThemeToggle />
+            <div className="w-px h-6 bg-border mx-1"></div>
+            <div className="flex items-center gap-2">
+              <div className="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-purple-400 flex items-center justify-center text-white text-sm font-medium">
+                {session?.user?.name?.[0] || session?.user?.email?.[0] || "U"}
+              </div>
+            </div>
+          </div>
+        </header>
+
+        {/* Page content */}
+        <main className="p-4 lg:p-6">{children}</main>
+      </div>
     </div>
   )
 }

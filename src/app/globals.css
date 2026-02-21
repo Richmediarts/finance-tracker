@@ -1,46 +1,35 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 :root {
+  --radius: 0.75rem;
   --primary: #6C5DD3;
   --primary-foreground: #FFFFFF;
   --accent: #C4F250;
   --accent-foreground: #11142D;
-  --secondary: #E4E1F8;
-  --secondary-foreground: #11142D;
-  --background: #FFFFFF;
-  --foreground: #11142D;
-  --card: #F7F7FB;
-  --card-foreground: #11142D;
-  --muted: #F7F7FB;
-  --muted-foreground: #808191;
-  --border: #E4E1F8;
-  --input: #F7F7FB;
+  --secondary: #2A2D3E;
+  --secondary-foreground: #FFFFFF;
+  --background: #11142D;
+  --foreground: #FFFFFF;
+  --card: #1E2130;
+  --card-foreground: #FFFFFF;
+  --muted: #2A2D3E;
+  --muted-foreground: #9CA3AF;
+  --border: #2A2D3E;
+  --input: #2A2D3E;
   --ring: #6C5DD3;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --popover: #FFFFFF;
-  --popover-foreground: #11142D;
+  --popover: #1E2130;
+  --popover-foreground: #FFFFFF;
 }
 
-* {
-  box-sizing: border-box;
-  padding: 0;
-  margin: 0;
-}
+* { box-sizing: border-box; padding: 0; margin: 0; }
 
-html,
-body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-}
+html, body { max-width: 100vw; overflow-x: hidden; }
 
 body {
   color: var(--foreground);
   background: var(--background);
 }
 
-a {
-  color: inherit;
-  text-decoration: none;
-}
+a { color: inherit; text-decoration: none; }
