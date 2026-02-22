@@ -11,7 +11,38 @@ export async function GET(req: Request) {
   if (!session?.user?.id) return NextResponse.json({ error: "Unauthorized" }, { status: 401 })
   const { searchParams } = new URL(req.url)
   const limit = parseInt(searchParams.get("limit") || "50")
-  const transactions = await db.transaction.findMany({ where: { userId: session.user.id }, include: { category: true, account: true }, orderBy: { date: "desc" }, take: limit })
+  // Build dynamic filters from query params
+  const dateFrom = searchParams.get("dateFrom")
+  const dateTo = searchParams.get("dateTo")
+  const description = searchParams.get("description") ?? undefined
+  const accountId = searchParams.get("accountId") ?? undefined
+  const categoryId = searchParams.get("categoryId") ?? undefined
+  const minAmount = searchParams.get("minAmount") ?? undefined
+  const maxAmount = searchParams.get("maxAmount") ?? undefined
+
+  const where: any = { userId: session.user.id }
+
+  if (dateFrom || dateTo) {
+    where.date = {}
+    if (dateFrom) (where.date as any).gte = new Date(dateFrom)
+    if (dateTo) (where.date as any).lte = new Date(dateTo)
+  }
+  if (description) {
+    where.description = { contains: description, mode: "insensitive" }
+  }
+  if (accountId) {
+    where.accountId = accountId
+  }
+  if (categoryId) {
+    where.categoryId = categoryId
+  }
+  if (minAmount || maxAmount) {
+    where.amount = {}
+    if (minAmount) (where.amount as any).gte = Number(minAmount)
+    if (maxAmount) (where.amount as any).lte = Number(maxAmount)
+  }
+
+  const transactions = await db.transaction.findMany({ where, include: { category: true, account: true }, orderBy: { date: "desc" }, take: limit })
   return NextResponse.json({ transactions })
 }
 

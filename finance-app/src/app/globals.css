@@ -10,19 +10,19 @@
   --accent-foreground: #11142D;
   --secondary: #2A2D3E;
   --secondary-foreground: #FFFFFF;
-  --background: #11142D;
-  --foreground: #FFFFFF;
-  --card: #1E2130;
-  --card-foreground: #FFFFFF;
-  --muted: #2A2D3E;
-  --muted-foreground: #9CA3AF;
-  --border: #2A2D3E;
-  --input: #2A2D3E;
+  --background: #F7F7FB;
+  --foreground: #111827;
+  --card: #FFFFFF;
+  --card-foreground: #111827;
+  --muted: #64748B;
+  --muted-foreground: #6B7280;
+  --border: #E5E7EB;
+  --input: #E5E7EB;
   --ring: #6C5DD3;
   --destructive: #EF4444;
   --destructive-foreground: #FFFFFF;
-  --popover: #1E2130;
-  --popover-foreground: #FFFFFF;
+  --popover: #FFFFFF;
+  --popover-foreground: #111827;
 }
 
 * { box-sizing: border-box; padding: 0; margin: 0; }
@@ -36,19 +36,19 @@ body {
 
 /* Dark theme overrides using the Tailwind-class toggle 'dark' on the root html element */
 html.dark {
-  --background: #0b1020;
-  --foreground: #e5e7eb;
-  --card: #141522;
-  --card-foreground: #e5e7eb;
-  --muted: #2a2d3e;
-  --muted-foreground: #a0a3af;
-  --border: #2c2f43;
-  --input: #1f2130;
-  --ring: #7c5bd3;
-  --popover: #141522;
-  --popover-foreground: #e5e7eb;
-  --primary: #8b5bd8;
-  --primary-foreground: #ffffff;
+  --background: #11142D;
+  --foreground: #FFFFFF;
+  --card: #1E2130;
+  --card-foreground: #FFFFFF;
+  --muted: #2A2D3E;
+  --muted-foreground: #9CA3AF;
+  --border: #2A2D3E;
+  --input: #2A2D3E;
+  --ring: #6C5DD3;
+  --popover: #1E2130;
+  --popover-foreground: #FFFFFF;
+  --primary: #6C5DD3;
+  --primary-foreground: #FFFFFF;
 }
 
 a { color: inherit; text-decoration: none; }

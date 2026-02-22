@@ -1,0 +1,48 @@
+version: '3.9'
+
+services:
+  app:
+    build: .
+    image: finance-tracker-prod:latest
+    ports:
+      - "3000:3000"
+    environment:
+      - DATABASE_URL=postgresql://financeuser:financepassword123@db:5432/financeapp
+      - NEXTAUTH_SECRET=${NEXTAUTH_SECRET:-change-this-secret-in-production}
+      - NEXTAUTH_URL=http://10.0.0.225
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  nginx:
+    image: nginx:1.23-alpine
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/default.conf.template:/etc/nginx/conf.d/default.conf.template:ro
+      - ./nginx/start-nginx.sh:/start-nginx.sh:ro
+    environment:
+      - PUBLIC_HOSTNAME=${PUBLIC_HOSTNAME:-10.0.0.225}
+    depends_on:
+      - app
+    restart: unless-stopped
+    command: ["/bin/sh", "/start-nginx.sh"]
+
+  db:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_USER=financeuser
+      - POSTGRES_PASSWORD=financepassword123
+      - POSTGRES_DB=financeapp
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U financeuser"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
