@@ -4,7 +4,7 @@ import { formatCurrency, formatDate } from "@/lib/utils"
 import { Plus, Search } from "lucide-react"
 import Link from "next/link"
 
-interface Category { id: string; name: string; color?: string; type: string }
+interface Category { id: string; name: string; color?: string; type?: string }
 interface Account { id: string; name: string }
 interface Transaction { id: string; amount: number; date: string; description?: string; category: Category | null; account: Account }
 

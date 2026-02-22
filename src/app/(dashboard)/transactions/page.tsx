@@ -9,7 +9,7 @@ interface Category {
   name: string
   icon?: string
   color?: string
-  type: string
+  type?: string
 }
 
 interface Account {
