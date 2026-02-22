@@ -7,19 +7,15 @@ COPY package*.json ./
 
 RUN npm install
 
-# Copy finance-app source
+# Copy finance-app source (ONLY from finance-app, not root src)
 COPY finance-app/src ./src/
+COPY finance-app/public ./public/ 2>/dev/null || true
 COPY finance-app/prisma ./prisma/
 COPY finance-app/next.config.js ./
 COPY finance-app/tailwind.config.ts ./
 COPY finance-app/tsconfig.json ./
 COPY finance-app/postcss.config.js ./
-COPY finance-app/.env* ./
-COPY tailwind.config.ts ./
-COPY next.config.js ./
-
-# Copy public if it exists
-RUN if [ -d "finance-app/public" ]; then cp -r finance-app/public ./; fi
+COPY finance-app/.env* ./ 2>/dev/null || true
 
 RUN npx prisma generate
 
