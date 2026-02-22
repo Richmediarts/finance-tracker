@@ -8,7 +8,7 @@ interface Category {
   id: string
   name: string
   color?: string
-  type: string
+  type?: string
 }
 
 interface Budget {

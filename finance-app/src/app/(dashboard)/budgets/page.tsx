@@ -3,7 +3,7 @@ import { useEffect, useState } from "react"
 import { formatCurrency } from "@/lib/utils"
 import { Plus } from "lucide-react"
 
-interface Category { id: string; name: string; color?: string }
+interface Category { id: string; name: string; color?: string; type?: string }
 interface Budget { id: string; amount: number; period: string; category: Category }
 
 export default function BudgetsPage() {
