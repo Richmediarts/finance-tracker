@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+# Pre-commit hook: run backup of changed files before allowing commit
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+BACKUP_SCRIPT="$REPO_ROOT/finance-app/scripts/backup_changed.sh"
+
+if [ -x "$BACKUP_SCRIPT" ]; then
+  echo "Running pre-commit backup..."
+  bash "$BACKUP_SCRIPT"
+  echo "Backup completed. Continuing commit."
+else
+  echo "Backup script not found or not executable: $BACKUP_SCRIPT" >&2
+fi
+
+exit 0

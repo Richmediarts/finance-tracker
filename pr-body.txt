@@ -1,0 +1,22 @@
+Budget UI redesign: Implemented an initial Monarch-like budgets UI with a two-column layout and a right-hand summary panel. Changes include a responsive layout, income/expense scaffolding, and a backup script hook.
+
+What changed:
+- Updated Budgets page for a responsive two-column layout on larger screens.
+- Added an interactive income/expense scaffolding section.
+- Introduced a right-hand summary panel to display budget progress and a placeholder summary.
+- Added an external backup script (backup_changed.sh) and scaffolding for automated pre-commit backups.
+
+Why:
+Improve clarity and visual hierarchy, moving toward the Monarch-like layout you shared.
+
+How to test:
+- Check /budgets on desktop and mobile.
+- Verify the backup script works: bash finance-app/scripts/backup_changed.sh
+
+Next steps:
+- Refine typography, spacing, and colors to match the screenshot exactly.
+- Add more complete income/expenses data sections.
+- Add tests and accessibility checks.
+
+Notes:
+This PR is ready for review. I can iterate further on UI details in subsequent PRs.
