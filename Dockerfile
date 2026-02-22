@@ -2,10 +2,15 @@ FROM node:20-alpine
 
 WORKDIR /app
 
-COPY package*.json ./
+# Copy package files from finance-app
+COPY finance-app/package*.json ./
+COPY finance-app/prisma ./prisma/
+
 RUN npm install
 
-COPY . .
+# Copy source from finance-app
+COPY finance-app/ ./
+
 RUN npx prisma generate
 
 RUN npm run build

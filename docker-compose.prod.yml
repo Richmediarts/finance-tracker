@@ -3,7 +3,7 @@ version: '3.9'
 services:
   app:
     build:
-      context: ./finance-app
+      context: .
       dockerfile: Dockerfile
     image: finance-tracker-prod:latest
     ports:
